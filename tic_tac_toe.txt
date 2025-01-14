@@ -1,0 +1,75 @@
+def print_board(board):
+    # Вывод текущего состояние игрового поля с номерами строк и столбцов
+    size = len(board)
+    print("   " + "   ".join(str(i) for i in range(size)))  # Номера столбцов
+    print("  +---" + "---+".join(" " for _ in range(size)))  # Разделительная линия
+
+    for i, row in enumerate(board):
+        print(f"{i} | " + " | ".join(row) + " |")  # Номер строки и содержимое
+        print("  +---" + "---+".join(" " for _ in range(size)))  # Разделительная линия
+
+def check_winner(board):
+    # Проверка, есть ли победитель на текущем поле
+    size = len(board)
+
+    # Проверка строк, столбцов и диагоналей
+    for i in range(size):
+        if all(cell == board[i][0] != " " for cell in board[i]):
+            return board[i][0]
+        if all(board[j][i] == board[0][i] != " " for j in range(size)):
+            return board[0][i]
+
+    if all(board[i][i] == board[0][0] != " " for i in range(size)):
+        return board[0][0]
+    if all(board[i][size - 1 - i] == board[0][size - 1] != " " for i in range(size)):
+        return board[0][size - 1]
+
+    return None
+
+def is_valid_input(user_input, size):
+    # Проверка, корректен ли ввод пользователя
+    try:
+        x, y = map(int, user_input.split())
+        return 0 <= x < size and 0 <= y < size
+    except ValueError:
+        return False
+
+def main():
+    # Основная функция игры
+    size = 3  # Размер игрового поля
+    board = [[" " for _ in range(size)] for _ in range(size)]
+
+    current_player = "X"
+
+    while True:
+        print_board(board)
+
+        user_input = input(f"Игрок {current_player}, введите координаты (строка и столбец через пробел): ")
+
+        if not is_valid_input(user_input, size):
+            print("Некорректный ввод. Попробуйте снова.")
+            continue
+
+        x, y = map(int, user_input.split())
+
+        if board[x][y] != " ":
+            print("Эта клетка уже занята. Попробуйте снова.")
+            continue
+
+        board[x][y] = current_player
+
+        winner = check_winner(board)
+        if winner:
+            print_board(board)
+            print(f"Игрок {winner} выиграл!")
+            break
+
+        if all(cell != " " for row in board for cell in row):  # Проверка на ничью
+            print_board(board)
+            print("Игра закончилась вничью!")
+            break
+
+        current_player = "O" if current_player == "X" else "X"
+
+if __name__ == "__main__":
+    main()
